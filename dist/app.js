@@ -14,6 +14,7 @@ const retakeBox = document.querySelector("#retake");
 const apiToggle = document.querySelector("#api-toggle");
 const apiStatus = document.querySelector("#api-status");
 const resultNoteText = document.querySelector("#result-note-text");
+const API_PASSWORD = "noortctt";
 
 let sourceImage = "";
 let currentImage = "";
@@ -22,12 +23,22 @@ let busy = false;
 let localSettings = defaultLocalSettings();
 
 apiToggle.addEventListener("click", () => {
-  apiEnabled = !apiEnabled;
-  apiToggle.textContent = apiEnabled ? "On" : "Off";
-  apiToggle.setAttribute("aria-pressed", String(apiEnabled));
-  apiStatus.textContent = apiEnabled
-    ? "On - use secure backend when available"
-    : "Off - browser result only";
+  if (apiEnabled) {
+    setApiEnabled(false);
+    return;
+  }
+
+  const password = window.prompt("Enter password to turn on OpenAI API");
+  if (password === API_PASSWORD) {
+    clearMessages();
+    setApiEnabled(true);
+    return;
+  }
+
+  setApiEnabled(false);
+  if (password !== null) {
+    showError("Wrong password. OpenAI API stayed off.");
+  }
 });
 
 uploadButton.addEventListener("click", () => {
@@ -212,6 +223,15 @@ function setBusy(value, title = "Preparing your photo...") {
   applyButton.disabled = value;
   changeInput.disabled = value;
   apiToggle.disabled = value;
+}
+
+function setApiEnabled(value) {
+  apiEnabled = value;
+  apiToggle.textContent = value ? "On" : "Off";
+  apiToggle.setAttribute("aria-pressed", String(value));
+  apiStatus.textContent = value
+    ? "On - use secure backend when available"
+    : "Off - browser result only";
 }
 
 function clearMessages() {
