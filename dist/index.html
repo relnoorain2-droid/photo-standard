@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Prepare an identity photo to the selected ICAO/UAE photo specification." />
+    <meta name="description" content="Prepare an identity photo with optional secure OpenAI cleanup and browser-only fallback." />
     <meta name="theme-color" content="#ffffff" />
     <title>Photo Standard</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23111627'/%3E%3Cpath d='M20 15h24v34H20z' fill='white'/%3E%3Ccircle cx='32' cy='27' r='7' fill='%23111627'/%3E%3Cpath d='M24 43c1-7 5-10 8-10s7 3 8 10' fill='%23111627'/%3E%3C/svg%3E" />
@@ -21,10 +21,18 @@
       <section class="intro" aria-labelledby="page-title">
         <p class="eyebrow">ICAO / UAE PHOTO</p>
         <h1 id="page-title">Upload your photo</h1>
-        <p>We’ll prepare it on a clean white background while preserving your identity.</p>
+        <p>Get a result instantly. Use OpenAI only when you turn it on.</p>
       </section>
 
       <section class="workspace" aria-live="polite">
+        <div class="api-panel">
+          <div>
+            <strong>OpenAI API</strong>
+            <small id="api-status">Off - local browser result only</small>
+          </div>
+          <button id="api-toggle" class="toggle-button" type="button" aria-pressed="false">Off</button>
+        </div>
+
         <input id="photo-input" type="file" accept="image/jpeg,image/png,image/webp" hidden />
 
         <button id="upload-button" class="upload" type="button">
@@ -36,7 +44,7 @@
             <small>JPG, PNG or WebP</small>
           </span>
         </button>
-        <p class="privacy-note">Your photo is processed securely. This site does not store uploaded or finished photos.</p>
+        <p class="privacy-note">This site does not save photos. AI mode uses the secure backend; if it is off or unavailable, the browser-only result still works.</p>
 
         <div id="processing" class="processing" hidden>
           <span class="spinner" aria-hidden="true"></span>
@@ -67,7 +75,7 @@
 
           <div class="result-note">
             <span aria-hidden="true">✓</span>
-            <p>Prepared to the selected ICAO/UAE photo specification.</p>
+            <p id="result-note-text">Prepared as a 35:45 browser result.</p>
           </div>
 
           <div class="refine">

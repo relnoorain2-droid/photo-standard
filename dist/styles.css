@@ -106,6 +106,39 @@ h1 {
 
 .workspace { max-width: 760px; margin: 0 auto; }
 
+.api-panel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 14px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fff;
+}
+
+.api-panel div { display: grid; gap: 4px; }
+.api-panel strong { font-size: 15px; }
+.api-panel small { color: var(--muted); font-size: 13px; line-height: 1.4; }
+
+.toggle-button {
+  min-width: 72px;
+  min-height: 40px;
+  border: 1px solid #cbd0d7;
+  border-radius: 999px;
+  background: #fff;
+  color: var(--ink);
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.toggle-button[aria-pressed="true"] {
+  border-color: var(--blue);
+  background: var(--blue);
+  color: #fff;
+}
+
 .upload {
   width: 100%;
   min-height: 154px;
@@ -241,6 +274,7 @@ textarea:focus { border-color: var(--blue); outline: 3px solid rgba(35,94,231,.1
   .intro > p:last-child { font-size: 16px; }
   .upload { min-height: 128px; }
   .comparison { gap: 12px; }
+  .api-panel { align-items: flex-start; }
   .change-row { grid-template-columns: 1fr; }
   .primary-button, .download-button { width: 100%; }
   .download-button { margin-top: 10px; }
