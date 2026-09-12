@@ -188,17 +188,7 @@ async function makeLocalResult(dataUrl) {
   const outputWidth = 1050;
   const outputHeight = 1350;
   const targetRatio = outputWidth / outputHeight;
-  const imageRatio = image.naturalWidth / image.naturalHeight;
-  let drawWidth;
-  let drawHeight;
-
-  if (imageRatio > targetRatio) {
-    drawHeight = outputHeight * localSettings.zoom;
-    drawWidth = drawHeight * imageRatio;
-  } else {
-    drawWidth = outputWidth * localSettings.zoom;
-    drawHeight = drawWidth / imageRatio;
-  }
+  const crop = await getLocalCrop(image, targetRatio);
 
   const canvas = document.createElement("canvas");
   canvas.width = outputWidth;
@@ -207,11 +197,167 @@ async function makeLocalResult(dataUrl) {
   context.fillStyle = "#ffffff";
   context.fillRect(0, 0, outputWidth, outputHeight);
   context.filter = `brightness(${localSettings.brightness}) contrast(${localSettings.contrast})`;
-  const x = (outputWidth - drawWidth) / 2 + localSettings.offsetX * outputWidth;
-  const y = (outputHeight - drawHeight) / 2 + localSettings.offsetY * outputHeight;
-  context.drawImage(image, x, y, drawWidth, drawHeight);
+  context.drawImage(image, crop.x, crop.y, crop.width, crop.height, 0, 0, outputWidth, outputHeight);
   context.filter = "none";
+  cleanPlainBackground(context, outputWidth, outputHeight);
   return canvas.toDataURL("image/png");
+}
+
+async function getLocalCrop(image, targetRatio) {
+  const face = await detectMainFace(image);
+  if (face) {
+    const faceCenterX = face.x + face.width / 2;
+    const faceCenterY = face.y + face.height / 2;
+    let cropHeight = face.height / (0.34 * localSettings.zoom);
+    let cropWidth = cropHeight * targetRatio;
+
+    const minWidth = Math.min(image.naturalWidth, image.naturalHeight * targetRatio);
+    cropWidth = Math.max(cropWidth, minWidth * 0.68);
+    cropHeight = cropWidth / targetRatio;
+
+    if (cropWidth > image.naturalWidth) {
+      cropWidth = image.naturalWidth;
+      cropHeight = cropWidth / targetRatio;
+    }
+    if (cropHeight > image.naturalHeight) {
+      cropHeight = image.naturalHeight;
+      cropWidth = cropHeight * targetRatio;
+    }
+
+    const x = clamp(faceCenterX - cropWidth / 2 + localSettings.offsetX * cropWidth, 0, image.naturalWidth - cropWidth);
+    const y = clamp(faceCenterY - cropHeight * 0.39 + localSettings.offsetY * cropHeight, 0, image.naturalHeight - cropHeight);
+    return { x, y, width: cropWidth, height: cropHeight };
+  }
+
+  const sourceRatio = image.naturalWidth / image.naturalHeight;
+  let width = image.naturalWidth;
+  let height = image.naturalHeight;
+  let x = 0;
+  let y = 0;
+
+  if (sourceRatio > targetRatio) {
+    width = image.naturalHeight * targetRatio / localSettings.zoom;
+    height = image.naturalHeight / localSettings.zoom;
+  } else {
+    width = image.naturalWidth / localSettings.zoom;
+    height = image.naturalWidth / targetRatio / localSettings.zoom;
+  }
+
+  x = clamp((image.naturalWidth - width) / 2 + localSettings.offsetX * width, 0, image.naturalWidth - width);
+  y = clamp((image.naturalHeight - height) / 2 + localSettings.offsetY * height, 0, image.naturalHeight - height);
+  return { x, y, width, height };
+}
+
+async function detectMainFace(image) {
+  if (!("FaceDetector" in window)) return null;
+
+  try {
+    const detector = new FaceDetector({ fastMode: true, maxDetectedFaces: 3 });
+    const faces = await detector.detect(image);
+    const largest = faces
+      .map(face => face.boundingBox)
+      .sort((a, b) => (b.width * b.height) - (a.width * a.height))[0];
+
+    if (!largest || largest.width < 30 || largest.height < 30) return null;
+    return {
+      x: largest.x,
+      y: largest.y,
+      width: largest.width,
+      height: largest.height
+    };
+  } catch {
+    return null;
+  }
+}
+
+function cleanPlainBackground(context, width, height) {
+  const imageData = context.getImageData(0, 0, width, height);
+  const { data } = imageData;
+  const bg = estimateBorderColor(data, width, height);
+  const visited = new Uint8Array(width * height);
+  const queue = [];
+  const push = (x, y) => {
+    if (x < 0 || y < 0 || x >= width || y >= height) return;
+    const index = y * width + x;
+    if (visited[index]) return;
+    const offset = index * 4;
+    if (!isBackgroundPixel(data, offset, bg)) return;
+    visited[index] = 1;
+    queue.push(index);
+  };
+
+  for (let x = 0; x < width; x += 1) {
+    push(x, 0);
+    push(x, height - 1);
+  }
+  for (let y = 0; y < height; y += 1) {
+    push(0, y);
+    push(width - 1, y);
+  }
+
+  while (queue.length) {
+    const index = queue.pop();
+    const offset = index * 4;
+    data[offset] = 255;
+    data[offset + 1] = 255;
+    data[offset + 2] = 255;
+
+    const x = index % width;
+    const y = Math.floor(index / width);
+    push(x + 1, y);
+    push(x - 1, y);
+    push(x, y + 1);
+    push(x, y - 1);
+  }
+
+  context.putImageData(imageData, 0, 0);
+}
+
+function estimateBorderColor(data, width, height) {
+  let red = 0;
+  let green = 0;
+  let blue = 0;
+  let count = 0;
+  const sample = (x, y) => {
+    const offset = (y * width + x) * 4;
+    red += data[offset];
+    green += data[offset + 1];
+    blue += data[offset + 2];
+    count += 1;
+  };
+
+  const step = 12;
+  for (let x = 0; x < width; x += step) {
+    sample(x, 0);
+    sample(x, height - 1);
+  }
+  for (let y = 0; y < height; y += step) {
+    sample(0, y);
+    sample(width - 1, y);
+  }
+
+  return {
+    red: red / count,
+    green: green / count,
+    blue: blue / count
+  };
+}
+
+function isBackgroundPixel(data, offset, bg) {
+  const red = data[offset];
+  const green = data[offset + 1];
+  const blue = data[offset + 2];
+  const distance = Math.hypot(red - bg.red, green - bg.green, blue - bg.blue);
+  const max = Math.max(red, green, blue);
+  const min = Math.min(red, green, blue);
+  const lowSaturation = max - min < 38;
+  const lightNeutral = lowSaturation && max > 150;
+  return distance < 62 || lightNeutral;
+}
+
+function clamp(value, min, max) {
+  if (max < min) return min;
+  return Math.min(max, Math.max(min, value));
 }
 
 function setBusy(value, title = "Preparing your photo...") {
