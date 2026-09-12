@@ -39,6 +39,10 @@ async function processRequest(request, env) {
     return json({ status: "API_OFF" }, 409);
   }
 
+  if (env.OPENAI_API_ENABLED !== "true") {
+    return json({ status: "API_UNAVAILABLE", error: "AI is turned off. Showing the browser result instead." }, 503);
+  }
+
   if (!env.OPENAI_API_KEY) {
     return json({ status: "API_UNAVAILABLE", error: "AI is not connected yet." }, 503);
   }

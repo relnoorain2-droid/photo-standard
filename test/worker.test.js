@@ -15,7 +15,7 @@ test("returns generated image from OpenAI", async () => {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ sourceImage, useApi: true })
-    }), { OPENAI_API_KEY: "test-key", ASSETS: { fetch: originalFetch } });
+    }), { OPENAI_API_ENABLED: "true", OPENAI_API_KEY: "test-key", ASSETS: { fetch: originalFetch } });
     const body = await response.json();
     assert.equal(response.status, 200);
     assert.equal(body.image, "data:image/png;base64,aW1hZ2U=");
@@ -40,7 +40,18 @@ test("protects provider when key is missing", async () => {
     method: "POST",
     headers: { "content-type": "application/json" },
     body: JSON.stringify({ sourceImage, useApi: true })
-  }), {});
+  }), { OPENAI_API_ENABLED: "true" });
+  const body = await response.json();
+  assert.equal(response.status, 503);
+  assert.equal(body.status, "API_UNAVAILABLE");
+});
+
+test("keeps provider disabled unless explicitly enabled", async () => {
+  const response = await worker.fetch(new Request("https://example.com/api/process", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ sourceImage, useApi: true })
+  }), { OPENAI_API_KEY: "test-key" });
   const body = await response.json();
   assert.equal(response.status, 503);
   assert.equal(body.status, "API_UNAVAILABLE");
