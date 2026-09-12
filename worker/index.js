@@ -59,7 +59,7 @@ async function processRequest(request, env) {
   form.append("image", dataUrlToFile(current || source, "photo.png"));
   form.append("prompt", buildPrompt(instruction, Boolean(current)));
   form.append("size", "1024x1536");
-  form.append("quality", "high");
+  form.append("quality", "medium");
   form.append("output_format", "png");
   form.append("input_fidelity", "high");
 
@@ -93,17 +93,13 @@ async function processRequest(request, env) {
 }
 
 function buildPrompt(instruction, editingCurrentResult) {
-  const task = instruction
-    ? `Apply this requested change only if it stays identity-preserving: ${instruction}`
-    : "Prepare this real photo as an ICAO/UAE-style identity photo.";
+  const requestedChange = instruction
+    ? `\n\nRequested adjustment from user: ${instruction}\nApply this adjustment only if it stays identity-preserving and ICAO/UAE immigration-ready.`
+    : "";
 
-  return `${task}
+  return `Edit this photo to ICAO/UAE immigration standards. Keep the person's identity, facial features and natural skin tone unchanged. Face straight toward camera, head upright and perfectly centered, both sides of face clearly visible, eyes open and looking directly at camera, neutral expression with mouth closed. Use a plain light/white background, even shadow-free lighting, natural brightness/contrast and sharp quality. Crop as a close-up showing head and top of shoulders, with the face occupying approximately 70-80% of the photo. No blur, filters, retouching that changes appearance, red-eye, flash reflection, shadows, tilted pose, hair covering eyes, distracting objects or other people. Keep the final result natural and immigration/ICAO-ready.
 
-The input image is ${editingCurrentResult ? "the current prepared result" : "the original identity reference"}. Keep the exact same real person. Preserve face shape, age, skin texture, hairline, ears, eyes, nose, mouth, facial hair, marks, natural asymmetry, and all identifying features. Do not beautify, reshape, smooth skin, add makeup, change identity, generate a new person, or invent hidden facial details.
-
-Create a plain uniform white or near-white background, neutral even lighting, natural color, closed neutral mouth, visible forward-looking eyes, full head with headroom, neck and shoulders, and a passport/visa photo composition suitable for a final 35:45 crop. Preserve the original clothing color, neckline, shoulder shape, and visible accessories unless the requested change explicitly says otherwise. Avoid halos, warped shoulders, duplicated hair, artificial teeth, plastic skin, compression artifacts, and over-sharpening.
-
-If the source is too blurry, strongly turned, occluded, filtered, or missing identity-critical details, do not guess. Keep the safest possible crop and background cleanup. Never claim official approval or guaranteed acceptance.`;
+The input image is ${editingCurrentResult ? "the current prepared result" : "the original identity reference"}. Preserve the original clothing color, neckline, shoulder shape, and visible accessories unless the requested adjustment explicitly says otherwise. Do not beautify, reshape, smooth skin, add makeup, change identity, generate a new person, or invent hidden facial details. If the source is too blurry, strongly turned, occluded, filtered, or missing identity-critical details, do not guess. Keep the safest possible crop and background cleanup. Never claim official approval or guaranteed acceptance.${requestedChange}`;
 }
 
 function parseImage(value) {
