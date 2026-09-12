@@ -101,7 +101,7 @@ function buildPrompt(instruction, editingCurrentResult) {
 
 The input image is ${editingCurrentResult ? "the current prepared result" : "the original identity reference"}. Keep the exact same real person. Preserve face shape, age, skin texture, hairline, ears, eyes, nose, mouth, facial hair, marks, natural asymmetry, and all identifying features. Do not beautify, reshape, smooth skin, add makeup, change identity, generate a new person, or invent hidden facial details.
 
-Create a plain uniform white or near-white background, neutral even lighting, natural color, closed neutral mouth, visible forward-looking eyes, full head with headroom, neck and shoulders, and a passport/visa photo composition suitable for a final 35:45 crop. Avoid halos, warped shoulders, duplicated hair, artificial teeth, plastic skin, compression artifacts, and over-sharpening.
+Create a plain uniform white or near-white background, neutral even lighting, natural color, closed neutral mouth, visible forward-looking eyes, full head with headroom, neck and shoulders, and a passport/visa photo composition suitable for a final 35:45 crop. Preserve the original clothing color, neckline, shoulder shape, and visible accessories unless the requested change explicitly says otherwise. Avoid halos, warped shoulders, duplicated hair, artificial teeth, plastic skin, compression artifacts, and over-sharpening.
 
 If the source is too blurry, strongly turned, occluded, filtered, or missing identity-critical details, do not guess. Keep the safest possible crop and background cleanup. Never claim official approval or guaranteed acceptance.`;
 }

@@ -110,7 +110,7 @@ async function processPhoto(instruction) {
     changeInput.value = "";
     resultNoteText.textContent = result.mode === "api"
       ? "Prepared with AI, then cropped to 35:45."
-      : "Prepared locally in your browser as a 35:45 result.";
+      : "Prepared locally as a safer 35:45 crop. Turn AI on for full white-background cleanup.";
     requestAnimationFrame(() => resultArea.scrollIntoView({ behavior: "smooth", block: "start" }));
   } catch (error) {
     showError(error.message || "The photo could not be processed right now. Please try again.");
@@ -208,11 +208,11 @@ async function getLocalCrop(image, targetRatio) {
   if (face) {
     const faceCenterX = face.x + face.width / 2;
     const faceCenterY = face.y + face.height / 2;
-    let cropHeight = face.height / (0.34 * localSettings.zoom);
+    let cropHeight = face.height / (0.27 * localSettings.zoom);
     let cropWidth = cropHeight * targetRatio;
 
     const minWidth = Math.min(image.naturalWidth, image.naturalHeight * targetRatio);
-    cropWidth = Math.max(cropWidth, minWidth * 0.68);
+    cropWidth = Math.max(cropWidth, minWidth * 0.76);
     cropHeight = cropWidth / targetRatio;
 
     if (cropWidth > image.naturalWidth) {
@@ -225,7 +225,7 @@ async function getLocalCrop(image, targetRatio) {
     }
 
     const x = clamp(faceCenterX - cropWidth / 2 + localSettings.offsetX * cropWidth, 0, image.naturalWidth - cropWidth);
-    const y = clamp(faceCenterY - cropHeight * 0.39 + localSettings.offsetY * cropHeight, 0, image.naturalHeight - cropHeight);
+    const y = clamp(faceCenterY - cropHeight * 0.36 + localSettings.offsetY * cropHeight, 0, image.naturalHeight - cropHeight);
     return { x, y, width: cropWidth, height: cropHeight };
   }
 
@@ -274,6 +274,11 @@ function cleanPlainBackground(context, width, height) {
   const imageData = context.getImageData(0, 0, width, height);
   const { data } = imageData;
   const bg = estimateBorderColor(data, width, height);
+
+  if (!isSafeToCleanBackground(bg)) {
+    return;
+  }
+
   const visited = new Uint8Array(width * height);
   const queue = [];
   const push = (x, y) => {
@@ -348,11 +353,15 @@ function isBackgroundPixel(data, offset, bg) {
   const green = data[offset + 1];
   const blue = data[offset + 2];
   const distance = Math.hypot(red - bg.red, green - bg.green, blue - bg.blue);
-  const max = Math.max(red, green, blue);
-  const min = Math.min(red, green, blue);
-  const lowSaturation = max - min < 38;
-  const lightNeutral = lowSaturation && max > 150;
-  return distance < 62 || lightNeutral;
+  return distance < 46;
+}
+
+function isSafeToCleanBackground(bg) {
+  const max = Math.max(bg.red, bg.green, bg.blue);
+  const min = Math.min(bg.red, bg.green, bg.blue);
+  const saturation = max - min;
+  const brightness = (bg.red + bg.green + bg.blue) / 3;
+  return saturation < 34 && brightness > 158;
 }
 
 function clamp(value, min, max) {
