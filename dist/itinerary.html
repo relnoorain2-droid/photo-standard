@@ -60,16 +60,27 @@
 
         <div id="itinerary-message" class="message retake" role="status" hidden></div>
 
-        <div id="documents" class="documents single-document" hidden>
+        <div id="documents" class="documents" hidden>
           <section class="document-card">
             <div class="document-toolbar">
-              <h2>Flight + hotel itinerary</h2>
+              <h2>Flight itinerary</h2>
               <div class="document-actions">
-                <button id="copy-itinerary" class="small-action" type="button">Copy</button>
-                <button id="download-itinerary" class="small-action" type="button">Download</button>
+                <button id="copy-flight" class="small-action" type="button">Copy</button>
+                <button id="download-flight" class="small-action" type="button">Download</button>
               </div>
             </div>
-            <div id="itinerary-document" class="document-body"></div>
+            <div id="flight-document" class="document-body"></div>
+          </section>
+
+          <section class="document-card">
+            <div class="document-toolbar">
+              <h2>Hotel plan</h2>
+              <div class="document-actions">
+                <button id="copy-hotel" class="small-action" type="button">Copy</button>
+                <button id="download-hotel" class="small-action" type="button">Download</button>
+              </div>
+            </div>
+            <div id="hotel-document" class="document-body"></div>
           </section>
         </div>
       </section>
