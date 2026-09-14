@@ -402,7 +402,7 @@ function showError(message) {
 async function prepareUpload(file) {
   const dataUrl = await readFile(file);
   const image = await loadImage(dataUrl);
-  const maxSide = 1800;
+  const maxSide = 1024;
   const scale = Math.min(1, maxSide / Math.max(image.naturalWidth, image.naturalHeight));
   const canvas = document.createElement("canvas");
   canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
@@ -411,7 +411,7 @@ async function prepareUpload(file) {
   context.fillStyle = "#ffffff";
   context.fillRect(0, 0, canvas.width, canvas.height);
   context.drawImage(image, 0, 0, canvas.width, canvas.height);
-  return canvas.toDataURL("image/jpeg", 0.9);
+  return canvas.toDataURL("image/jpeg", 0.82);
 }
 
 async function cropToSevenByNine(dataUrl) {

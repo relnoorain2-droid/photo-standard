@@ -62,8 +62,8 @@ async function processRequest(request, env) {
   form.append("model", env.OPENAI_IMAGE_MODEL || OPENAI_IMAGE_MODEL);
   form.append("image", dataUrlToFile(current || source, "photo.png"));
   form.append("prompt", buildPrompt(instruction, Boolean(current)));
-  form.append("size", "1024x1536");
-  form.append("quality", "medium");
+  form.append("size", "1024x1024");
+  form.append("quality", "low");
   form.append("output_format", "png");
   form.append("input_fidelity", "high");
 
@@ -101,7 +101,7 @@ function buildPrompt(instruction, editingCurrentResult) {
     ? `\n\nRequested adjustment from user: ${instruction}\nApply this adjustment only if it stays identity-preserving and ICAO/UAE immigration-ready.`
     : "";
 
-  return `Edit this photo to ICAO/UAE immigration standards. Keep the person's identity, facial features and natural skin tone unchanged. Face straight toward camera, head upright and perfectly centered, both sides of face clearly visible, eyes open and looking directly at camera, neutral expression with mouth closed. Use a plain light/white background, even shadow-free lighting, natural brightness/contrast and sharp quality. Crop as a close-up showing head and top of shoulders, with the face occupying approximately 70-80% of the photo. No blur, filters, retouching that changes appearance, red-eye, flash reflection, shadows, tilted pose, hair covering eyes, distracting objects or other people. Keep the final result natural and immigration/ICAO-ready.
+  return `Edit this photo to ICAO/UAE immigration standards. Keep the person's identity, facial features and natural skin tone unchanged. Face straight toward camera, head upright and perfectly centered, both sides of face clearly visible, eyes open and looking directly at camera, neutral expression with mouth closed. Use a plain light/white background, even shadow-free lighting, natural brightness/contrast and clean sharp quality suitable for online upload. Crop as a close-up showing head and top of shoulders, with the face occupying approximately 70-80% of the photo. No blur, filters, retouching that changes appearance, red-eye, flash reflection, shadows, tilted pose, hair covering eyes, distracting objects or other people. Keep the final result natural and immigration/ICAO-ready.
 
 The input image is ${editingCurrentResult ? "the current prepared result" : "the original identity reference"}. Preserve the original clothing color, neckline, shoulder shape, and visible accessories unless the requested adjustment explicitly says otherwise. Do not beautify, reshape, smooth skin, add makeup, change identity, generate a new person, or invent hidden facial details. If the source is too blurry, strongly turned, occluded, filtered, or missing identity-critical details, do not guess. Keep the safest possible crop and background cleanup. Never claim official approval or guaranteed acceptance.${requestedChange}`;
 }
