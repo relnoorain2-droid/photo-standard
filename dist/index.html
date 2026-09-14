@@ -15,6 +15,10 @@
         <span class="brand-mark" aria-hidden="true"></span>
         <span>Photo Standard</span>
       </a>
+      <nav class="topnav" aria-label="Site navigation">
+        <a href="./">Photo</a>
+        <a href="./itinerary.html">Itinerary</a>
+      </nav>
     </header>
 
     <main>
@@ -66,7 +70,14 @@
               </div>
             </figure>
             <figure>
-              <figcaption>Result</figcaption>
+              <figcaption class="result-caption">
+                <span>Result</span>
+                <span class="quick-actions">
+                  <a id="download-button" class="small-action" href="#" download="prepared-icao-uae-photo.png">Download</a>
+                  <button id="copy-button" class="small-action" type="button">Copy</button>
+                  <button id="change-jump-button" class="small-action" type="button">Need a change?</button>
+                </span>
+              </figcaption>
               <div class="photo-frame result-frame">
                 <img id="result-preview" alt="Prepared identity photo result" />
               </div>
@@ -85,8 +96,6 @@
               <button id="apply-button" class="primary-button" type="button">Apply change</button>
             </div>
           </div>
-
-          <a id="download-button" class="download-button" href="#" download="prepared-icao-uae-photo.png">Download result</a>
         </div>
       </section>
 

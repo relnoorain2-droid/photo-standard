@@ -9,6 +9,8 @@ const resultPreview = document.querySelector("#result-preview");
 const changeInput = document.querySelector("#change-input");
 const applyButton = document.querySelector("#apply-button");
 const downloadButton = document.querySelector("#download-button");
+const copyButton = document.querySelector("#copy-button");
+const changeJumpButton = document.querySelector("#change-jump-button");
 const errorBox = document.querySelector("#error");
 const retakeBox = document.querySelector("#retake");
 const apiToggle = document.querySelector("#api-toggle");
@@ -79,6 +81,13 @@ applyButton.addEventListener("click", async () => {
   await processPhoto(instruction);
 });
 
+copyButton.addEventListener("click", copyResultImage);
+
+changeJumpButton.addEventListener("click", () => {
+  changeInput.scrollIntoView({ behavior: "smooth", block: "center" });
+  changeInput.focus({ preventScroll: true });
+});
+
 changeInput.addEventListener("keydown", (event) => {
   if ((event.ctrlKey || event.metaKey) && event.key === "Enter") {
     applyButton.click();
@@ -147,6 +156,28 @@ async function requestAiResult(instruction) {
   } catch {
     showError("AI is not reachable. Showing the browser-only result instead.");
     return null;
+  }
+}
+
+async function copyResultImage() {
+  if (!currentImage) return;
+
+  try {
+    const response = await fetch(currentImage);
+    const blob = await response.blob();
+    await navigator.clipboard.write([
+      new ClipboardItem({ [blob.type || "image/png"]: blob })
+    ]);
+    retakeBox.textContent = "Result copied. You can paste it where you need.";
+    retakeBox.hidden = false;
+  } catch {
+    try {
+      await navigator.clipboard.writeText(currentImage);
+      retakeBox.textContent = "Image link copied. If paste does not show the photo, use Download.";
+      retakeBox.hidden = false;
+    } catch {
+      showError("Copy is not available in this browser. Please use Download.");
+    }
   }
 }
 

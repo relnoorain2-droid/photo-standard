@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
-    "test": "node --test && node --check dist/app.js"
+    "test": "node --test && node --check dist/app.js && node --check dist/itinerary.js"
   },
   "devDependencies": {
     "wrangler": "^4.35.0"

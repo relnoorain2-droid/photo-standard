@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Create a clear UAE travel itinerary plan with flight and hotel sections for copying or downloading." />
+    <meta name="theme-color" content="#ffffff" />
+    <title>Itinerary</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23111627'/%3E%3Cpath d='M20 15h24v34H20z' fill='white'/%3E%3Ccircle cx='32' cy='27' r='7' fill='%23111627'/%3E%3Cpath d='M24 43c1-7 5-10 8-10s7 3 8 10' fill='%23111627'/%3E%3C/svg%3E" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="./" aria-label="Photo Standard home">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span>Photo Standard</span>
+      </a>
+      <nav class="topnav" aria-label="Site navigation">
+        <a href="./">Photo</a>
+        <a href="./itinerary.html" aria-current="page">Itinerary</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="intro" aria-labelledby="page-title">
+        <p class="eyebrow">TRAVEL ITINERARY</p>
+        <h1 id="page-title">Create itinerary</h1>
+        <p>Generate a clean travel plan for UAE trips. This is not an issued ticket or confirmed hotel booking.</p>
+      </section>
+
+      <section class="workspace">
+        <form id="itinerary-form" class="form-card">
+          <div class="form-grid">
+            <div class="field">
+              <label for="departure-airport">Departure airport</label>
+              <input id="departure-airport" list="departure-airports" autocomplete="off" />
+              <datalist id="departure-airports"></datalist>
+            </div>
+            <div class="field">
+              <label for="arrival-airport">Arrival airport</label>
+              <select id="arrival-airport"></select>
+            </div>
+            <div class="field">
+              <label for="checkin-date">Check-in date</label>
+              <input id="checkin-date" type="date" />
+            </div>
+            <div class="field">
+              <label for="checkout-date">Check-out date</label>
+              <input id="checkout-date" type="date" />
+            </div>
+          </div>
+
+          <div class="guest-list" id="guest-list" aria-label="Guests"></div>
+          <button id="add-guest" class="add-guest" type="button">Add more guest</button>
+
+          <div class="generate-row">
+            <button class="primary-button" type="submit">Generate</button>
+          </div>
+        </form>
+
+        <div id="itinerary-message" class="message retake" role="status" hidden></div>
+
+        <div id="documents" class="documents" hidden>
+          <section class="document-card">
+            <div class="document-toolbar">
+              <h2>Flight plan</h2>
+              <div class="document-actions">
+                <button id="copy-flight" class="small-action" type="button">Copy</button>
+                <button id="download-flight" class="small-action" type="button">Download</button>
+              </div>
+            </div>
+            <div id="flight-document" class="document-body"></div>
+          </section>
+
+          <section class="document-card">
+            <div class="document-toolbar">
+              <h2>Hotel plan</h2>
+              <div class="document-actions">
+                <button id="copy-hotel" class="small-action" type="button">Copy</button>
+                <button id="download-hotel" class="small-action" type="button">Download</button>
+              </div>
+            </div>
+            <div id="hotel-document" class="document-body"></div>
+          </section>
+        </div>
+      </section>
+
+      <p class="authority-note">This page creates a travel itinerary plan only. It is not a confirmed airline ticket, hotel booking, visa document, or payment receipt.</p>
+    </main>
+
+    <script type="module" src="./itinerary.js"></script>
+  </body>
+</html>
