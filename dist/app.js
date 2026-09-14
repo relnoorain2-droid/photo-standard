@@ -82,6 +82,7 @@ applyButton.addEventListener("click", async () => {
 });
 
 copyButton.addEventListener("click", copyResultImage);
+downloadButton.addEventListener("click", downloadResultImage);
 
 changeJumpButton.addEventListener("click", () => {
   changeInput.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -163,22 +164,63 @@ async function copyResultImage() {
   if (!currentImage) return;
 
   try {
-    const response = await fetch(currentImage);
-    const blob = await response.blob();
+    const blob = await imageDataUrlToBlob(currentImage, "image/png");
     await navigator.clipboard.write([
-      new ClipboardItem({ [blob.type || "image/png"]: blob })
+      new ClipboardItem({ "image/png": blob })
     ]);
-    retakeBox.textContent = "JPEG result copied. You can paste it where you need.";
+    retakeBox.textContent = "Image copied. You can paste it where you need.";
     retakeBox.hidden = false;
   } catch {
     try {
       await navigator.clipboard.writeText(currentImage);
-      retakeBox.textContent = "Image data copied. If paste does not show the JPEG, use Download.";
+      retakeBox.textContent = "Image data copied. If paste does not show the image, use Download.";
       retakeBox.hidden = false;
     } catch {
       showError("Copy is not available in this browser. Please use Download.");
     }
   }
+}
+
+async function downloadResultImage(event) {
+  if (!currentImage) {
+    event.preventDefault();
+    return;
+  }
+
+  event.preventDefault();
+  try {
+    const blob = await imageDataUrlToBlob(currentImage, "image/jpeg", 0.92);
+    const url = URL.createObjectURL(blob);
+    downloadButton.href = url;
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "prepared-icao-uae-photo.jpg";
+    link.rel = "noopener";
+    document.body.append(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  } catch {
+    window.open(currentImage, "_blank", "noopener");
+  }
+}
+
+async function imageDataUrlToBlob(dataUrl, type = "image/jpeg", quality = 0.92) {
+  const image = await loadImage(dataUrl);
+  const canvas = document.createElement("canvas");
+  canvas.width = image.naturalWidth || image.width;
+  canvas.height = image.naturalHeight || image.height;
+  const context = canvas.getContext("2d", { alpha: false });
+  context.fillStyle = "#ffffff";
+  context.fillRect(0, 0, canvas.width, canvas.height);
+  context.drawImage(image, 0, 0);
+
+  return new Promise((resolve, reject) => {
+    canvas.toBlob(blob => {
+      if (blob) resolve(blob);
+      else reject(new Error("Could not create image."));
+    }, type, quality);
+  });
 }
 
 function applyLocalInstruction(instruction) {
