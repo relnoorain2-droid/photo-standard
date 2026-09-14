@@ -106,10 +106,10 @@ form.addEventListener("submit", event => {
   generateDocuments();
 });
 
-document.querySelector("#copy-flight").addEventListener("click", () => copyText(latestFlightText, "Flight plan copied."));
-document.querySelector("#copy-hotel").addEventListener("click", () => copyText(latestHotelText, "Hotel plan copied."));
-document.querySelector("#download-flight").addEventListener("click", () => downloadDocument("flight-itinerary.html", flightDocument.innerHTML));
-document.querySelector("#download-hotel").addEventListener("click", () => downloadDocument("hotel-plan.html", hotelDocument.innerHTML));
+document.querySelector("#copy-flight").addEventListener("click", () => copyDocumentImage(flightDocument, "Flight plan JPEG copied."));
+document.querySelector("#copy-hotel").addEventListener("click", () => copyDocumentImage(hotelDocument, "Hotel plan JPEG copied."));
+document.querySelector("#download-flight").addEventListener("click", () => downloadDocumentImage("flight-itinerary.jpg", flightDocument));
+document.querySelector("#download-hotel").addEventListener("click", () => downloadDocumentImage("hotel-plan.jpg", hotelDocument));
 
 function addGuestRow(name, type) {
   guestCount += 1;
@@ -301,23 +301,94 @@ function buildHotelText(hotel, guests) {
   ].join("\n");
 }
 
-async function copyText(text, successMessage) {
+async function copyDocumentImage(element, successMessage) {
   try {
-    await navigator.clipboard.writeText(text);
+    const blob = await elementToJpegBlob(element);
+    await navigator.clipboard.write([
+      new ClipboardItem({ "image/jpeg": blob })
+    ]);
     showMessage(successMessage);
   } catch {
-    showMessage("Copy is not available in this browser. Please use Download.");
+    showMessage("JPEG copy is not available in this browser. Please use Download.");
   }
 }
 
-function downloadDocument(fileName, innerHtml) {
-  const html = `<!doctype html><html><head><meta charset="UTF-8"><title>${fileName}</title><link rel="stylesheet" href="./styles.css"></head><body><main>${innerHtml}</main></body></html>`;
-  const blob = new Blob([html], { type: "text/html" });
+async function downloadDocumentImage(fileName, element) {
+  const blob = await elementToJpegBlob(element);
   const link = document.createElement("a");
   link.href = URL.createObjectURL(blob);
   link.download = fileName;
   link.click();
   URL.revokeObjectURL(link.href);
+}
+
+async function elementToJpegBlob(element) {
+  await document.fonts?.ready;
+  const paper = element.querySelector(".doc-paper") || element;
+  const box = paper.getBoundingClientRect();
+  const width = Math.ceil(box.width);
+  const height = Math.ceil(box.height);
+  const clone = paper.cloneNode(true);
+  clone.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
+
+  const style = document.createElement("style");
+  style.textContent = getPageCss();
+  clone.prepend(style);
+
+  const serialized = new XMLSerializer().serializeToString(clone);
+  const svg = `
+    <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
+      <foreignObject width="100%" height="100%">
+        ${serialized}
+      </foreignObject>
+    </svg>
+  `;
+
+  const image = await loadSvgImage(svg);
+  const scale = 2;
+  const canvas = document.createElement("canvas");
+  canvas.width = width * scale;
+  canvas.height = height * scale;
+  const context = canvas.getContext("2d", { alpha: false });
+  context.fillStyle = "#ffffff";
+  context.fillRect(0, 0, canvas.width, canvas.height);
+  context.scale(scale, scale);
+  context.drawImage(image, 0, 0);
+
+  return new Promise((resolve, reject) => {
+    canvas.toBlob(blob => {
+      if (blob) resolve(blob);
+      else reject(new Error("Could not create JPEG."));
+    }, "image/jpeg", 0.92);
+  });
+}
+
+function getPageCss() {
+  return [...document.styleSheets]
+    .map(sheet => {
+      try {
+        return [...sheet.cssRules].map(rule => rule.cssText).join("\n");
+      } catch {
+        return "";
+      }
+    })
+    .join("\n");
+}
+
+function loadSvgImage(svg) {
+  return new Promise((resolve, reject) => {
+    const image = new Image();
+    const url = URL.createObjectURL(new Blob([svg], { type: "image/svg+xml;charset=utf-8" }));
+    image.onload = () => {
+      URL.revokeObjectURL(url);
+      resolve(image);
+    };
+    image.onerror = () => {
+      URL.revokeObjectURL(url);
+      reject(new Error("Could not render JPEG."));
+    };
+    image.src = url;
+  });
 }
 
 function findDepartureAirport(value) {

@@ -168,12 +168,12 @@ async function copyResultImage() {
     await navigator.clipboard.write([
       new ClipboardItem({ [blob.type || "image/png"]: blob })
     ]);
-    retakeBox.textContent = "Result copied. You can paste it where you need.";
+    retakeBox.textContent = "JPEG result copied. You can paste it where you need.";
     retakeBox.hidden = false;
   } catch {
     try {
       await navigator.clipboard.writeText(currentImage);
-      retakeBox.textContent = "Image link copied. If paste does not show the photo, use Download.";
+      retakeBox.textContent = "Image data copied. If paste does not show the JPEG, use Download.";
       retakeBox.hidden = false;
     } catch {
       showError("Copy is not available in this browser. Please use Download.");
@@ -231,7 +231,7 @@ async function makeLocalResult(dataUrl) {
   context.drawImage(image, crop.x, crop.y, crop.width, crop.height, 0, 0, outputWidth, outputHeight);
   context.filter = "none";
   cleanPlainBackground(context, outputWidth, outputHeight);
-  return canvas.toDataURL("image/png");
+  return canvas.toDataURL("image/jpeg", 0.92);
 }
 
 async function getLocalCrop(image, targetRatio) {
@@ -473,7 +473,7 @@ async function cropToSevenByNine(dataUrl) {
   context.imageSmoothingEnabled = true;
   context.imageSmoothingQuality = "high";
   context.drawImage(image, sourceX, sourceY, sourceWidth, sourceHeight, 0, 0, outputWidth, outputHeight);
-  return canvas.toDataURL("image/png");
+  return canvas.toDataURL("image/jpeg", 0.92);
 }
 
 function defaultLocalSettings() {
