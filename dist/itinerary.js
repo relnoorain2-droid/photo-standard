@@ -12,6 +12,13 @@ const hotelDocument = document.querySelector("#hotel-document");
 const message = document.querySelector("#itinerary-message");
 const hotelNameInput = document.querySelector("#hotel-name");
 const hotelAreaInput = document.querySelector("#hotel-area");
+const autoDownloadToggle = document.querySelector("#auto-download");
+const AUTO_KEY = "itinerary-auto-download";
+
+try { autoDownloadToggle.checked = localStorage.getItem(AUTO_KEY) === "on"; } catch {}
+autoDownloadToggle.addEventListener("change", () => {
+  try { localStorage.setItem(AUTO_KEY, autoDownloadToggle.checked ? "on" : "off"); } catch {}
+});
 
 const departureAirports = [
   ["DEL", "Indira Gandhi International Airport", "Delhi", "India"],
@@ -325,6 +332,15 @@ function generateDocuments() {
   hotelDocument.innerHTML = buildHotelHtml(hotel, guests);
   documentsArea.hidden = false;
   documentsArea.scrollIntoView({ behavior: "smooth", block: "start" });
+
+  if (autoDownloadToggle.checked) autoDownloadBoth();
+}
+
+async function autoDownloadBoth() {
+  await downloadDocumentImage(guestFileName("itinerary"), "flight");
+  await new Promise(resolve => setTimeout(resolve, 600));
+  await downloadDocumentImage(guestFileName("hotel plan"), "hotel");
+  showMessage("Flight itinerary and hotel plan downloaded.");
 }
 
 function getGuests() {
