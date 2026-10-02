@@ -260,8 +260,16 @@ form.addEventListener("submit", event => {
 
 document.querySelector("#copy-flight").addEventListener("click", () => copyDocumentImage("flight", "Flight itinerary image copied. You can paste it where you need."));
 document.querySelector("#copy-hotel").addEventListener("click", () => copyDocumentImage("hotel", "Hotel plan image copied. You can paste it where you need."));
-document.querySelector("#download-flight").addEventListener("click", () => downloadDocumentImage("flight-itinerary.jpg", "flight"));
-document.querySelector("#download-hotel").addEventListener("click", () => downloadDocumentImage("hotel-plan.jpg", "hotel"));
+document.querySelector("#download-flight").addEventListener("click", () => downloadDocumentImage(guestFileName("itinerary"), "flight"));
+document.querySelector("#download-hotel").addEventListener("click", () => downloadDocumentImage(guestFileName("hotel plan"), "hotel"));
+
+function guestFileName(label) {
+  const guests = (latestFlightData && latestFlightData.guests) || getGuests();
+  const lead = guests[0];
+  const name = lead ? `${lead.prefix} ${lead.name}` : "Guest";
+  const safe = name.replace(/[\\/:*?"<>|]+/g, "").replace(/\s+/g, " ").trim() || "Guest";
+  return `${safe} - ${label}.jpg`;
+}
 
 function addGuestRow(name, type) {
   guestCount += 1;
