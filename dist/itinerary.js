@@ -10,6 +10,8 @@ const documentsArea = document.querySelector("#documents");
 const flightDocument = document.querySelector("#flight-document");
 const hotelDocument = document.querySelector("#hotel-document");
 const message = document.querySelector("#itinerary-message");
+const hotelNameInput = document.querySelector("#hotel-name");
+const hotelAreaInput = document.querySelector("#hotel-area");
 
 const departureAirports = [
   ["DEL", "Indira Gandhi International Airport", "Delhi", "India"],
@@ -32,6 +34,35 @@ const departureAirports = [
   ["IXE", "Mangaluru International Airport", "Mangaluru", "India"],
   ["IXM", "Madurai Airport", "Madurai", "India"],
   ["CJB", "Coimbatore International Airport", "Coimbatore", "India"],
+  ["IXZ", "Veer Savarkar International Airport", "Port Blair", "India"],
+  ["VNS", "Lal Bahadur Shastri International Airport", "Varanasi", "India"],
+  ["GAU", "Lokpriya Gopinath Bordoloi International Airport", "Guwahati", "India"],
+  ["CMB", "Bandaranaike International Airport", "Colombo", "Sri Lanka"],
+  ["HRI", "Mattala Rajapaksa International Airport", "Hambantota", "Sri Lanka"],
+  ["KHI", "Jinnah International Airport", "Karachi", "Pakistan"],
+  ["LHE", "Allama Iqbal International Airport", "Lahore", "Pakistan"],
+  ["ISB", "Islamabad International Airport", "Islamabad", "Pakistan"],
+  ["PEW", "Bacha Khan International Airport", "Peshawar", "Pakistan"],
+  ["SKT", "Sialkot International Airport", "Sialkot", "Pakistan"],
+  ["MUX", "Multan International Airport", "Multan", "Pakistan"],
+  ["LYP", "Faisalabad International Airport", "Faisalabad", "Pakistan"],
+  ["DAC", "Hazrat Shahjalal International Airport", "Dhaka", "Bangladesh"],
+  ["CGP", "Shah Amanat International Airport", "Chittagong", "Bangladesh"],
+  ["ZYL", "Osmani International Airport", "Sylhet", "Bangladesh"],
+  ["KTM", "Tribhuvan International Airport", "Kathmandu", "Nepal"],
+  ["MLE", "Velana International Airport", "Male", "Maldives"],
+  ["KBL", "Kabul International Airport", "Kabul", "Afghanistan"],
+  ["MNL", "Ninoy Aquino International Airport", "Manila", "Philippines"],
+  ["CGK", "Soekarno-Hatta International Airport", "Jakarta", "Indonesia"],
+  ["CAI", "Cairo International Airport", "Cairo", "Egypt"],
+  ["AMM", "Queen Alia International Airport", "Amman", "Jordan"],
+  ["BEY", "Beirut-Rafic Hariri International Airport", "Beirut", "Lebanon"],
+  ["ADD", "Addis Ababa Bole International Airport", "Addis Ababa", "Ethiopia"],
+  ["NBO", "Jomo Kenyatta International Airport", "Nairobi", "Kenya"],
+  ["LOS", "Murtala Muhammed International Airport", "Lagos", "Nigeria"],
+  ["TAS", "Islam Karimov Tashkent International Airport", "Tashkent", "Uzbekistan"],
+  ["ALA", "Almaty International Airport", "Almaty", "Kazakhstan"],
+  ["SVO", "Sheremetyevo International Airport", "Moscow", "Russia"],
   ["LHR", "Heathrow Airport", "London", "United Kingdom"],
   ["LGW", "Gatwick Airport", "London", "United Kingdom"],
   ["JFK", "John F. Kennedy International Airport", "New York", "United States"],
@@ -127,15 +158,62 @@ const airportTerminals = {
   FJR: "Main Terminal"
 };
 
+const ALL = "*";
+const IN = ["India"];
+const SUB = ["India", "Sri Lanka", "Pakistan", "Bangladesh", "Nepal", "Afghanistan"];
+const REGIONAL = ["Sri Lanka", "Pakistan", "Bangladesh", "Nepal", "Maldives", "Afghanistan", "Egypt", "Jordan", "Lebanon", "Ethiopia", "Kenya", "Uzbekistan", "Kazakhstan", "Russia", "Saudi Arabia", "Kuwait", "Bahrain", "Oman", "Qatar", "Turkey", "India"];
+
+// Carrier options. countries = departure countries the carrier plausibly serves; uae = UAE airports it flies to.
 const flightScheduleOptions = [
-  { code: "EK", name: "Emirates", outbound: "09:25", inbound: "18:10", dxbTerminal: "Terminal 3", aircraft: "Boeing 777-300ER", cabin: "Economy", baggage: "30 kg checked + 7 kg cabin" },
-  { code: "AI", name: "Air India", outbound: "13:15", inbound: "23:40", dxbTerminal: "Terminal 1", aircraft: "Airbus A320neo", cabin: "Economy", baggage: "25 kg checked + 7 kg cabin" },
-  { code: "IX", name: "Air India Express", outbound: "04:10", inbound: "11:35", dxbTerminal: "Terminal 2", aircraft: "Boeing 737", cabin: "Economy", baggage: "20 kg checked + 7 kg cabin" },
-  { code: "6E", name: "IndiGo", outbound: "18:45", inbound: "05:20", dxbTerminal: "Terminal 1", aircraft: "Airbus A321neo", cabin: "Economy", baggage: "30 kg checked + 7 kg cabin" },
-  { code: "SG", name: "SpiceJet", outbound: "21:50", inbound: "07:15", dxbTerminal: "Terminal 1", aircraft: "Boeing 737 MAX", cabin: "Economy", baggage: "30 kg checked + 7 kg cabin" },
-  { code: "G9", name: "Air Arabia", outbound: "03:35", inbound: "20:45", dxbTerminal: "Sharjah Main Terminal", aircraft: "Airbus A320", cabin: "Economy", baggage: "20 kg checked + 10 kg cabin" },
-  { code: "EY", name: "Etihad Airways", outbound: "16:30", inbound: "02:25", dxbTerminal: "Terminal A", aircraft: "Boeing 787-9", cabin: "Economy", baggage: "30 kg checked + 7 kg cabin" }
+  carrier("EK", "Emirates", "09:25", "18:10", "Terminal 3", "Boeing 777-300ER", "30 kg checked + 7 kg cabin", ALL, ["DXB"]),
+  carrier("FZ", "flydubai", "06:40", "15:05", "Terminal 2", "Boeing 737 MAX 8", "20 kg checked + 7 kg cabin", REGIONAL, ["DXB", "DWC"]),
+  carrier("EY", "Etihad Airways", "16:30", "02:25", "Terminal A", "Boeing 787-9", "30 kg checked + 7 kg cabin", ALL, ["AUH"]),
+  carrier("G9", "Air Arabia", "03:35", "20:45", "Main Terminal", "Airbus A320", "20 kg checked + 10 kg cabin", REGIONAL, ["SHJ", "RKT"]),
+  carrier("3L", "Air Arabia Abu Dhabi", "11:20", "22:15", "Terminal A", "Airbus A320", "20 kg checked + 10 kg cabin", SUB.concat(["Egypt", "Jordan", "Russia", "Kazakhstan", "Uzbekistan"]), ["AUH"]),
+  carrier("AI", "Air India", "13:15", "23:40", "Terminal 1", "Airbus A320neo", "25 kg checked + 7 kg cabin", IN, ["DXB", "AUH", "SHJ"]),
+  carrier("IX", "Air India Express", "04:10", "11:35", "Terminal 1", "Boeing 737-8", "20 kg checked + 7 kg cabin", IN, ["DXB", "AUH", "SHJ", "RKT", "AAN"]),
+  carrier("6E", "IndiGo", "18:45", "05:20", "Terminal 1", "Airbus A321neo", "30 kg checked + 7 kg cabin", IN, ["DXB", "AUH", "SHJ", "RKT", "FJR"]),
+  carrier("SG", "SpiceJet", "21:50", "07:15", "Terminal 1", "Boeing 737 MAX 8", "30 kg checked + 7 kg cabin", IN, ["DXB"]),
+  carrier("UL", "SriLankan Airlines", "08:30", "21:55", "Terminal 1", "Airbus A330-300", "30 kg checked + 7 kg cabin", ["Sri Lanka"], ["DXB"]),
+  carrier("PK", "Pakistan International Airlines", "07:50", "19:30", "Terminal 1", "Airbus A320", "30 kg checked + 7 kg cabin", ["Pakistan"], ["DXB", "AUH", "SHJ"]),
+  carrier("PA", "Airblue", "10:15", "17:20", "Terminal 1", "Airbus A321", "30 kg checked + 7 kg cabin", ["Pakistan"], ["DXB", "SHJ", "AUH"]),
+  carrier("ER", "SereneAir", "14:40", "20:55", "Terminal 1", "Airbus A330-200", "30 kg checked + 7 kg cabin", ["Pakistan"], ["DXB", "SHJ"]),
+  carrier("9P", "Fly Jinnah", "05:25", "12:10", "Main Terminal", "Airbus A320", "20 kg checked + 7 kg cabin", ["Pakistan"], ["SHJ", "AUH"]),
+  carrier("BG", "Biman Bangladesh Airlines", "12:05", "18:35", "Terminal 1", "Boeing 787-8", "30 kg checked + 7 kg cabin", ["Bangladesh"], ["DXB", "AUH"]),
+  carrier("BS", "US-Bangla Airlines", "17:20", "00:45", "Terminal 1", "Airbus A330-300", "30 kg checked + 7 kg cabin", ["Bangladesh"], ["DXB", "SHJ"]),
+  carrier("RA", "Nepal Airlines", "09:55", "16:40", "Terminal 1", "Airbus A320", "30 kg checked + 7 kg cabin", ["Nepal"], ["DXB"]),
+  carrier("PR", "Philippine Airlines", "19:10", "01:30", "Terminal 1", "Airbus A321neo", "23 kg checked + 7 kg cabin", ["Philippines"], ["DXB"]),
+  carrier("5J", "Cebu Pacific", "22:35", "04:50", "Terminal 1", "Airbus A330neo", "20 kg checked + 7 kg cabin", ["Philippines"], ["DXB"]),
+  carrier("GA", "Garuda Indonesia", "18:05", "00:20", "Terminal 1", "Boeing 777-300ER", "30 kg checked + 7 kg cabin", ["Indonesia"], ["DXB"]),
+  carrier("MS", "EgyptAir", "15:10", "19:45", "Terminal 1", "Boeing 737-800", "23 kg checked + 7 kg cabin", ["Egypt"], ["DXB", "AUH"]),
+  carrier("RJ", "Royal Jordanian", "13:40", "18:50", "Terminal 1", "Airbus A320neo", "23 kg checked + 7 kg cabin", ["Jordan"], ["DXB", "AUH"]),
+  carrier("ME", "Middle East Airlines", "11:30", "16:25", "Terminal 1", "Airbus A321neo", "23 kg checked + 7 kg cabin", ["Lebanon"], ["DXB", "AUH"]),
+  carrier("ET", "Ethiopian Airlines", "10:45", "17:55", "Terminal 1", "Boeing 737 MAX 8", "23 kg checked + 7 kg cabin", ["Ethiopia"], ["DXB"]),
+  carrier("KQ", "Kenya Airways", "20:15", "03:05", "Terminal 1", "Boeing 737-800", "23 kg checked + 7 kg cabin", ["Kenya"], ["DXB"]),
+  carrier("HY", "Uzbekistan Airways", "08:10", "13:25", "Terminal 1", "Airbus A320neo", "23 kg checked + 7 kg cabin", ["Uzbekistan"], ["DXB"]),
+  carrier("KC", "Air Astana", "07:35", "14:15", "Terminal 1", "Airbus A321neo", "23 kg checked + 7 kg cabin", ["Kazakhstan"], ["DXB"]),
+  carrier("SU", "Aeroflot", "10:05", "16:50", "Terminal 1", "Airbus A330-300", "23 kg checked + 10 kg cabin", ["Russia"], ["DXB"]),
+  carrier("SV", "Saudia", "12:50", "17:35", "Terminal 1", "Airbus A320neo", "23 kg checked + 7 kg cabin", ["Saudi Arabia"], ["DXB"]),
+  carrier("XY", "flynas", "06:15", "10:40", "Terminal 1", "Airbus A320neo", "20 kg checked + 7 kg cabin", ["Saudi Arabia"], ["DXB"]),
+  carrier("QR", "Qatar Airways", "08:45", "14:30", "Terminal 1", "Airbus A320", "30 kg checked + 7 kg cabin", ["Qatar"], ["DXB"]),
+  carrier("KU", "Kuwait Airways", "14:20", "19:05", "Terminal 1", "Airbus A320neo", "30 kg checked + 7 kg cabin", ["Kuwait"], ["DXB"]),
+  carrier("GF", "Gulf Air", "09:05", "13:10", "Terminal 1", "Airbus A320neo", "23 kg checked + 7 kg cabin", ["Bahrain"], ["DXB"]),
+  carrier("WY", "Oman Air", "07:25", "11:15", "Terminal 1", "Boeing 737-800", "30 kg checked + 7 kg cabin", ["Oman"], ["DXB"]),
+  carrier("TK", "Turkish Airlines", "01:30", "06:55", "Terminal 1", "Airbus A330-300", "30 kg checked + 8 kg cabin", ["Turkey"], ["DXB"]),
+  carrier("BA", "British Airways", "20:40", "07:45", "Terminal 1", "Boeing 777-300ER", "23 kg checked + 23 kg cabin", ["United Kingdom"], ["DXB"]),
+  carrier("AF", "Air France", "11:05", "00:35", "Terminal 1", "Boeing 777-200ER", "23 kg checked + 12 kg cabin", ["France"], ["DXB"]),
+  carrier("LH", "Lufthansa", "10:35", "01:15", "Terminal 1", "Airbus A330-300", "23 kg checked + 8 kg cabin", ["Germany"], ["DXB"]),
+  carrier("KL", "KLM Royal Dutch Airlines", "14:25", "01:55", "Terminal 1", "Boeing 787-9", "23 kg checked + 12 kg cabin", ["Netherlands"], ["DXB"]),
+  carrier("SQ", "Singapore Airlines", "20:55", "09:40", "Terminal 1", "Boeing 777-300ER", "30 kg checked + 7 kg cabin", ["Singapore"], ["DXB"]),
+  carrier("MH", "Malaysia Airlines", "21:10", "09:55", "Terminal 1", "Airbus A330-300", "30 kg checked + 7 kg cabin", ["Malaysia"], ["DXB"]),
+  carrier("TG", "Thai Airways", "19:35", "21:50", "Terminal 1", "Boeing 777-300ER", "30 kg checked + 7 kg cabin", ["Thailand"], ["DXB"]),
+  carrier("AC", "Air Canada", "21:45", "08:30", "Terminal 1", "Boeing 787-9", "23 kg checked + 10 kg cabin", ["Canada"], ["DXB"]),
+  carrier("QF", "Qantas", "21:25", "10:15", "Terminal 3", "Airbus A380", "30 kg checked + 7 kg cabin", ["Australia"], ["DXB"])
 ];
+
+function carrier(code, name, outbound, inbound, dxbTerminal, aircraft, baggage, countries, uae) {
+  return { code, name, outbound, inbound, dxbTerminal, aircraft, cabin: "Economy", baggage, countries, uae };
+}
 
 let guestCount = 0;
 let latestFlightData = null;
@@ -254,7 +332,7 @@ function getGuests() {
 function buildFlight(from, to, date, direction) {
   const option = chooseFlightOption(from, to, date, direction);
   const [depHour, depMinute] = (direction === "outbound" ? option.outbound : option.inbound).split(":").map(Number);
-  const durationHours = estimateDuration(from[0], to[0]);
+  const durationHours = estimateDuration(from, to);
   const departureTime = setTime(date, depHour, depMinute);
   const arrivalTime = new Date(departureTime.getTime() + durationHours * 60 * 60 * 1000);
   const numberSeed = `${from[0]}${to[0]}`.split("").reduce((sum, char) => sum + char.charCodeAt(0), 0);
@@ -281,12 +359,16 @@ function buildHotel(arrival, checkin, checkout) {
   const nights = Math.max(1, Math.round((checkout - checkin) / 86400000));
   const city = arrival[2];
   const cityHotels = hotelOptions[city] || hotelOptions.Dubai;
-  const selected = cityHotels[Math.floor(Math.random() * cityHotels.length)];
+  const customName = hotelNameInput.value.trim();
+  const customArea = hotelAreaInput.value.trim();
+  const selected = customName
+    ? [customName, "Selected by traveller", customArea || city]
+    : cityHotels[Math.floor(Math.random() * cityHotels.length)];
   return {
     name: selected[0],
     rating: selected[1],
     city,
-    address: `${selected[2]}, United Arab Emirates`,
+    address: `${customArea || selected[2]}, United Arab Emirates`,
     checkin,
     checkout,
     nights,
@@ -375,7 +457,10 @@ function flightRow(title, flight) {
   return `
     <div class="flight-row">
       <div class="flight-row-title">
-        <strong>${title}</strong>
+        <div class="carrier-head">
+          <span class="carrier-badge">${escapeHtml(flight.airline.code)}</span>
+          <div><strong>${title}</strong><small>${escapeHtml(flight.airline.name)}</small></div>
+        </div>
         <span>${escapeHtml(flight.flightNo)}</span>
       </div>
       <div class="route-line">
@@ -555,14 +640,15 @@ function drawFlightSegment(ctx, title, flight, x, y, width) {
   y = drawSectionTitle(ctx, title, x, y);
   ctx.strokeStyle = "#dfe3e8";
   ctx.fillStyle = "#ffffff";
-  roundRect(ctx, x, y + 12, width, 405, 16, true, true);
+  roundRect(ctx, x, y + 12, width, 452, 16, true, true);
+  drawCarrierBadge(ctx, flight.airline.code, x + width / 2 - 34, y + 34);
   ctx.fillStyle = "#111827";
   ctx.font = "800 48px Arial, sans-serif";
   ctx.fillText(flight.from[0], x + 38, y + 94);
   ctx.textAlign = "center";
   ctx.fillStyle = "#235ee7";
   ctx.font = "800 36px Arial, sans-serif";
-  ctx.fillText("→", x + width / 2, y + 91);
+  ctx.fillText("→", x + width / 2, y + 128);
   ctx.fillStyle = "#111827";
   ctx.font = "800 48px Arial, sans-serif";
   ctx.fillText(flight.to[0], x + width - 86, y + 94);
@@ -574,17 +660,32 @@ function drawFlightSegment(ctx, title, flight, x, y, width) {
   ctx.fillText(`${flight.to[2]}, ${flight.to[3] || "UAE"}`, x + width - 38, y + 126);
   ctx.textAlign = "left";
 
-  const top = y + 158;
-  const w = (width - 76) / 3;
-  drawInfoBox(ctx, "Carrier option", `${flight.airline.name} (${flight.airline.code})`, x + 38, top, w, 88);
-  drawInfoBox(ctx, "Flight", flight.flightNo, x + 38 + w + 19, top, w, 88);
-  drawInfoBox(ctx, "Duration", flight.duration, x + 38 + (w + 19) * 2, top, w, 88);
-  drawInfoBox(ctx, "Departure", formatDateTime(flight.departureTime), x + 38, top + 108, (width - 95) / 2, 88);
-  drawInfoBox(ctx, "Arrival", formatDateTime(flight.arrivalTime), x + 57 + (width - 95) / 2, top + 108, (width - 95) / 2, 88);
-  drawInfoBox(ctx, "Departure terminal", flight.departureTerminal, x + 38, top + 216, w, 88);
-  drawInfoBox(ctx, "Arrival terminal", flight.arrivalTerminal, x + 38 + w + 19, top + 216, w, 88);
-  drawInfoBox(ctx, "Aircraft / baggage", `${flight.aircraft}; ${flight.baggage}`, x + 38 + (w + 19) * 2, top + 216, w, 88);
-  return y + 430;
+  const top = y + 150;
+  const gap = 19;
+  const inner = width - 76;
+  const w = (inner - gap * 2) / 3;
+  const half = (inner - gap) / 2;
+  const col = i => x + 38 + (w + gap) * i;
+  drawInfoBox(ctx, "Carrier option", `${flight.airline.name} (${flight.airline.code})`, col(0), top, w, 84);
+  drawInfoBox(ctx, "Flight", flight.flightNo, col(1), top, w, 84);
+  drawInfoBox(ctx, "Duration", flight.duration, col(2), top, w, 84);
+  drawInfoBox(ctx, "Departure", formatDateTime(flight.departureTime), x + 38, top + 100, half, 84);
+  drawInfoBox(ctx, "Arrival", formatDateTime(flight.arrivalTime), x + 38 + half + gap, top + 100, half, 84);
+  drawInfoBox(ctx, "Departure terminal", flight.departureTerminal, col(0), top + 200, w, 84);
+  drawInfoBox(ctx, "Arrival terminal", flight.arrivalTerminal, col(1), top + 200, w, 84);
+  drawInfoBox(ctx, "Aircraft / baggage", `${flight.aircraft}; ${flight.baggage}`, col(2), top + 200, w, 84);
+  return y + 470;
+}
+
+function drawCarrierBadge(ctx, code, x, y) {
+  ctx.fillStyle = "#eef2f7";
+  ctx.strokeStyle = "#cfd6df";
+  roundRect(ctx, x, y, 68, 52, 10, true, true);
+  ctx.fillStyle = "#1f2937";
+  ctx.font = "800 24px Arial, sans-serif";
+  ctx.textAlign = "center";
+  ctx.fillText(code, x + 34, y + 35);
+  ctx.textAlign = "left";
 }
 
 function drawInfoBox(ctx, label, value, x, y, width, height) {
@@ -663,14 +764,17 @@ function findDepartureAirport(value) {
 }
 
 function chooseFlightOption(from, to, date, direction) {
-  const arrivalCode = direction === "outbound" ? to[0] : from[0];
-  let options = flightScheduleOptions;
-  if (arrivalCode === "AUH") options = flightScheduleOptions.filter(option => ["EY", "AI", "IX", "6E"].includes(option.code));
-  if (arrivalCode === "SHJ" || arrivalCode === "RKT") options = flightScheduleOptions.filter(option => ["G9", "IX", "6E"].includes(option.code));
-  if (arrivalCode === "DWC") options = flightScheduleOptions.filter(option => ["EK", "IX", "6E"].includes(option.code));
-  if (arrivalCode === "AAN" || arrivalCode === "FJR") options = flightScheduleOptions.filter(option => ["AI", "IX", "6E"].includes(option.code));
+  const uaeAirport = direction === "outbound" ? to : from;
+  const foreignAirport = direction === "outbound" ? from : to;
+  const country = foreignAirport[3];
+  const servesUae = option => option.uae.includes(uaeAirport[0]);
+  const servesCountry = option => option.countries === ALL || option.countries.includes(country);
+  let options = flightScheduleOptions.filter(option => servesUae(option) && servesCountry(option));
+  // Prefer the home carrier of the departure country when one exists, alongside UAE carriers.
+  if (!options.length) options = flightScheduleOptions.filter(servesUae);
+  if (!options.length) options = flightScheduleOptions;
   const seed = `${from[0]}${to[0]}${toInputDate(date)}${direction}${Date.now()}`.split("").reduce((sum, char) => sum + char.charCodeAt(0), 0);
-  return options[seed % options.length] || flightScheduleOptions[0];
+  return options[seed % options.length];
 }
 
 function terminalFor(code, option) {
@@ -681,11 +785,22 @@ function terminalFor(code, option) {
   return airportTerminals[code] || "International Terminal";
 }
 
-function estimateDuration(fromCode, toCode) {
-  if (["DEL", "BOM", "AMD", "HYD", "BLR", "MAA", "COK", "CCJ", "TRV"].includes(fromCode) || ["DEL", "BOM", "AMD", "HYD", "BLR", "MAA", "COK", "CCJ", "TRV"].includes(toCode)) return 3.5;
-  if (["LHR", "CDG", "AMS", "FRA"].includes(fromCode) || ["LHR", "CDG", "AMS", "FRA"].includes(toCode)) return 7.25;
-  if (["JFK", "LAX", "YYZ"].includes(fromCode) || ["JFK", "LAX", "YYZ"].includes(toCode)) return 13.5;
-  return 5;
+const durationByCountry = {
+  India: 3.5, "Sri Lanka": 4.5, Pakistan: 2.5, Bangladesh: 5, Nepal: 4.5, Maldives: 4.25, Afghanistan: 2.75,
+  Philippines: 9.25, Indonesia: 8.5, Singapore: 7.5, Malaysia: 7.25, Thailand: 6.25,
+  Egypt: 3.75, Jordan: 3.25, Lebanon: 3.75, Ethiopia: 4, Kenya: 5.25, Nigeria: 8.5,
+  Uzbekistan: 3.5, Kazakhstan: 4.5, Russia: 5.5, "Saudi Arabia": 2.5, Kuwait: 1.75, Bahrain: 1.25,
+  Oman: 1.25, Qatar: 1.25, Turkey: 4.5, "United Kingdom": 7.25, France: 6.75, Germany: 6.25,
+  Netherlands: 6.75, "United States": 14, Canada: 13.5, Australia: 14.25
+};
+
+function estimateDuration(from, to) {
+  const foreign = from[3] ? from : to;
+  let hours = durationByCountry[foreign[3]] || 5;
+  if (foreign[0] === "LAX") hours = 16;
+  if (["GAU", "CCU", "IXZ"].includes(foreign[0])) hours = 4.5;
+  if (["ATQ", "IXC", "JAI", "LKO", "AMD", "BOM"].includes(foreign[0])) hours = 3;
+  return hours;
 }
 
 function formatDuration(hours) {
