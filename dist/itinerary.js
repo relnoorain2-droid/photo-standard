@@ -41,21 +41,32 @@ const departureAirports = [
   ["IXE", "Mangaluru International Airport", "Mangaluru", "India"],
   ["IXM", "Madurai Airport", "Madurai", "India"],
   ["CJB", "Coimbatore International Airport", "Coimbatore", "India"],
-  ["IXZ", "Veer Savarkar International Airport", "Port Blair", "India"],
-  ["VNS", "Lal Bahadur Shastri International Airport", "Varanasi", "India"],
+  ["CNN", "Kannur International Airport", "Kannur", "India"],
+  ["STV", "Surat International Airport", "Surat", "India"],
+  ["TRZ", "Tiruchirappalli International Airport", "Tiruchirappalli", "India"],
+  ["BBI", "Biju Patnaik International Airport", "Bhubaneswar", "India"],
   ["GAU", "Lokpriya Gopinath Bordoloi International Airport", "Guwahati", "India"],
+  ["IDR", "Devi Ahilya Bai Holkar Airport", "Indore", "India"],
+  ["VGA", "Vijayawada International Airport", "Vijayawada", "India"],
+  ["NAG", "Dr. Babasaheb Ambedkar International Airport", "Nagpur", "India"],
+  ["VTZ", "Visakhapatnam International Airport", "Visakhapatnam", "India"],
+  ["NMI", "Navi Mumbai International Airport", "Navi Mumbai", "India"],
+  ["LYP", "Faisalabad International Airport", "Faisalabad", "Pakistan"],
+  ["UET", "Quetta International Airport", "Quetta", "Pakistan"],
+  ["KDU", "Skardu International Airport", "Skardu", "Pakistan"],
+  ["ZYL", "Osmani International Airport", "Sylhet", "Bangladesh"],
+  ["PKR", "Pokhara International Airport", "Pokhara", "Nepal"],
+  ["BWA", "Gautam Buddha International Airport", "Bhairahawa", "Nepal"],
+  ["KHT", "Khost International Airport", "Khost", "Afghanistan"],
   ["CMB", "Bandaranaike International Airport", "Colombo", "Sri Lanka"],
-  ["HRI", "Mattala Rajapaksa International Airport", "Hambantota", "Sri Lanka"],
   ["KHI", "Jinnah International Airport", "Karachi", "Pakistan"],
   ["LHE", "Allama Iqbal International Airport", "Lahore", "Pakistan"],
   ["ISB", "Islamabad International Airport", "Islamabad", "Pakistan"],
   ["PEW", "Bacha Khan International Airport", "Peshawar", "Pakistan"],
   ["SKT", "Sialkot International Airport", "Sialkot", "Pakistan"],
   ["MUX", "Multan International Airport", "Multan", "Pakistan"],
-  ["LYP", "Faisalabad International Airport", "Faisalabad", "Pakistan"],
   ["DAC", "Hazrat Shahjalal International Airport", "Dhaka", "Bangladesh"],
   ["CGP", "Shah Amanat International Airport", "Chittagong", "Bangladesh"],
-  ["ZYL", "Osmani International Airport", "Sylhet", "Bangladesh"],
   ["KTM", "Tribhuvan International Airport", "Kathmandu", "Nepal"],
   ["MLE", "Velana International Airport", "Male", "Maldives"],
   ["KBL", "Kabul International Airport", "Kabul", "Afghanistan"],
@@ -215,8 +226,96 @@ const flightScheduleOptions = [
   carrier("MH", "Malaysia Airlines", "21:10", "09:55", "Terminal 1", "Airbus A330-300", "30 kg checked + 7 kg cabin", ["Malaysia"], ["DXB"]),
   carrier("TG", "Thai Airways", "19:35", "21:50", "Terminal 1", "Boeing 777-300ER", "30 kg checked + 7 kg cabin", ["Thailand"], ["DXB"]),
   carrier("AC", "Air Canada", "21:45", "08:30", "Terminal 1", "Boeing 787-9", "23 kg checked + 10 kg cabin", ["Canada"], ["DXB"]),
+  carrier("QP", "Akasa Air", "07:05", "13:40", "Terminal 1", "Boeing 737 MAX 8", "20 kg checked + 7 kg cabin", [], []),
+  carrier("PF", "AirSial", "15:30", "22:20", "Terminal 1", "Airbus A320", "30 kg checked + 7 kg cabin", [], []),
+  carrier("FG", "Ariana Afghan Airlines", "09:40", "14:50", "Terminal 1", "Airbus A310", "30 kg checked + 7 kg cabin", [], []),
+  carrier("RQ", "Kam Air", "11:50", "16:30", "Terminal 1", "Boeing 767-300ER", "30 kg checked + 7 kg cabin", [], []),
   carrier("QF", "Qantas", "21:25", "10:15", "Terminal 3", "Airbus A380", "30 kg checked + 7 kg cabin", ["Australia"], ["DXB"])
 ];
+
+// Direct routes only (checked against airport route tables, Oct 2026): departure airport -> UAE airport -> carriers that operate it.
+// Arrival list and carrier choice are limited to these, so no route is shown that does not exist.
+const routes = {
+  ADD: { DXB: ["EK", "FZ", "ET"], SHJ: ["G9"] },
+  ALA: { DXB: ["FZ", "KC"], SHJ: ["G9"] },
+  AMD: { DXB: ["EK", "FZ", "6E", "SG"], AUH: ["3L", "QP", "EY", "6E"], SHJ: ["G9", "SG"] },
+  AMM: { DXB: ["EK", "FZ", "RJ"], AUH: ["EY", "RJ"], SHJ: ["G9"] },
+  AMS: { DXB: ["EK", "KL"], AUH: ["EY"] },
+  ATQ: { DXB: ["IX", "SG"] },
+  BAH: { DXB: ["EK", "FZ", "GF"], AUH: ["EY", "GF"], SHJ: ["G9"] },
+  BBI: { DXB: ["6E"], AUH: ["6E"] },
+  BEY: { DXB: ["EK", "FZ", "ME"], AUH: ["EY", "ME"] },
+  BKK: { DXB: ["EK", "TG"], AUH: ["EY"], SHJ: ["G9"] },
+  BLR: { DXB: ["EK", "6E"], AUH: ["3L", "IX", "QP", "EY", "6E"], SHJ: ["G9"] },
+  BOM: { DXB: ["EK", "FZ", "AI", "6E", "SG"], AUH: ["IX"], SHJ: ["G9"], FJR: ["6E"] },
+  BWA: { DXB: ["FZ"] },
+  CAI: { DXB: ["EK", "FZ", "MS"], AUH: ["EY", "MS"], SHJ: ["G9"], RKT: ["G9"] },
+  CCJ: { DXB: ["FZ", "IX", "6E", "SG"], AUH: ["3L", "IX", "EY", "6E"], SHJ: ["G9"], RKT: ["IX", "G9"], AAN: ["IX"] },
+  CCU: { DXB: ["EK", "FZ"], AUH: ["3L", "EY"] },
+  CDG: { DXB: ["EK", "AF"], AUH: ["EY"] },
+  CGK: { DXB: ["EK"], AUH: ["EY"] },
+  CGP: { DXB: ["FZ", "BG"] },
+  CJB: { AUH: ["6E"], SHJ: ["G9"] },
+  CMB: { DXB: ["EK", "FZ", "UL"], AUH: ["3L", "EY"], SHJ: ["G9"] },
+  CNN: { DXB: ["IX"], AUH: ["IX", "6E"], RKT: ["IX"], FJR: ["6E"] },
+  COK: { DXB: ["EK", "FZ", "IX", "6E", "SG"], AUH: ["EY"], RKT: ["6E"] },
+  DAC: { DXB: ["EK", "FZ", "BG", "BS"], AUH: ["3L", "IX", "EY"], SHJ: ["BS"] },
+  DEL: { DXB: ["EK", "FZ", "AI", "6E", "SG"], AUH: ["EY"], SHJ: ["G9"] },
+  DOH: { DXB: ["FZ", "QR"], AUH: ["EY", "QR"], SHJ: ["G9"] },
+  FRA: { DXB: ["EK", "LH"], AUH: ["EY"] },
+  GAU: { DXB: ["IX"], AUH: ["IX"] },
+  GOI: { DXB: ["IX"] },
+  GOX: { AUH: ["IX"], SHJ: ["G9"] },
+  HYD: { DXB: ["EK", "FZ", "6E"], AUH: ["IX", "EY", "6E"], SHJ: ["G9"], RKT: ["6E"] },
+  IDR: { AUH: ["IX"], SHJ: ["IX"] },
+  ISB: { DXB: ["EK", "FZ", "PK", "PA", "ER", "PF"], AUH: ["EY", "PK", "RJ"], AAN: ["PK"] },
+  IST: { DXB: ["EK", "FZ", "TK"], AUH: ["EY", "TK"], SHJ: ["G9"] },
+  IXC: { DXB: ["6E"], AUH: ["6E"] },
+  IXE: { DXB: ["IX", "6E"], AUH: ["6E"] },
+  IXM: { DXB: ["SG"], AUH: ["6E"] },
+  JAI: { DXB: ["IX", "SG"], AUH: ["EY"], SHJ: ["G9", "IX"] },
+  JED: { DXB: ["EK", "FZ", "SV"], AUH: ["EY", "SV"], SHJ: ["G9"], RKT: ["G9"] },
+  JFK: { DXB: ["EK"], AUH: ["EY"] },
+  KBL: { DXB: ["FZ", "FG", "RQ"], AUH: ["3L", "EY"] },
+  KDU: { DXB: ["PK"] },
+  KHI: { DXB: ["EK", "FZ", "PK", "PA"], AUH: ["EY", "PK"] },
+  KHT: { DXB: ["RQ"], AAN: ["FG"] },
+  KTM: { DXB: ["FZ", "RA"], AUH: ["3L"], SHJ: ["G9"] },
+  KUL: { DXB: ["EK"], AUH: ["EY"] },
+  KWI: { DXB: ["EK", "FZ", "KU"], AUH: ["EY", "KU"] },
+  LAX: { DXB: ["EK"] },
+  LGW: { DXB: ["EK"], SHJ: ["G9"] },
+  LHE: { DXB: ["EK", "FZ", "PK", "PA", "ER", "9P", "PF"], AUH: ["EY", "PK"], SHJ: ["9P"] },
+  LHR: { DXB: ["EK", "BA"], AUH: ["EY"] },
+  LKO: { DXB: ["FZ", "IX"], AUH: ["IX", "6E"], RKT: ["IX"] },
+  LOS: { DXB: ["EK"] },
+  LYP: { DXB: ["FZ", "PK"] },
+  MAA: { DXB: ["EK", "6E"], AUH: ["3L", "QP", "EY", "6E"], SHJ: ["G9"] },
+  MCT: { DXB: ["EK", "FZ", "WY"], AUH: ["EY"], SHJ: ["G9"] },
+  MLE: { DXB: ["EK", "FZ"], AUH: ["EY"], SHJ: ["G9"] },
+  MNL: { DXB: ["EK", "PR", "5J"], AUH: ["EY"] },
+  MUX: { DXB: ["FZ", "PK", "PA"] },
+  NAG: { SHJ: ["G9"] },
+  NBO: { DXB: ["EK", "FZ", "KQ"], SHJ: ["G9"] },
+  NMI: { AUH: ["IX"] },
+  PEW: { DXB: ["EK", "FZ", "PK"], AUH: ["EY", "PK"], SHJ: ["PK"] },
+  PKR: { DXB: ["FZ"] },
+  PNQ: { DXB: ["6E", "SG"], AUH: ["IX"] },
+  RUH: { DXB: ["EK", "FZ", "SV", "XY"], AUH: ["EY", "SV"], SHJ: ["G9"] },
+  SIN: { DXB: ["EK", "SQ"], AUH: ["EY"] },
+  SKT: { DXB: ["EK", "FZ", "PK"], AUH: ["3L", "PK"], SHJ: ["PK"] },
+  STV: { DXB: ["IX", "6E"] },
+  SVO: { DXB: ["SU"] },
+  SYD: { DXB: ["EK", "QF"], AUH: ["EY"] },
+  TAS: { DXB: ["FZ", "HY"], SHJ: ["G9"], RKT: ["G9"] },
+  TRV: { DXB: ["EK", "IX"], AUH: ["EY"], SHJ: ["G9"] },
+  TRZ: { DXB: ["IX"], AUH: ["6E"] },
+  UET: { DXB: ["FZ"] },
+  VGA: { SHJ: ["IX"] },
+  VTZ: { AUH: ["6E"] },
+  YYZ: { DXB: ["EK", "AC"], AUH: ["EY"] },
+  ZYL: { DXB: ["BG"], SHJ: ["BG"] }
+};
 
 function carrier(code, name, outbound, inbound, dxbTerminal, aircraft, baggage, countries, uae) {
   return { code, name, outbound, inbound, dxbTerminal, aircraft, cabin: "Economy", baggage, countries, uae };
@@ -230,6 +329,7 @@ init();
 
 function init() {
   departureList.innerHTML = departureAirports
+    .filter(airport => routes[airport[0]])
     .map(airport => `<option value="${formatAirport(airport)}"></option>`)
     .join("");
 
@@ -238,7 +338,10 @@ function init() {
     .join("");
 
   departureInput.value = formatAirport(departureAirports[0]);
+  refreshArrivalOptions();
   arrivalSelect.value = "DXB";
+  departureInput.addEventListener("change", refreshArrivalOptions);
+  departureInput.addEventListener("input", refreshArrivalOptions);
 
   const checkinDate = addDays(new Date(), 6);
   const checkoutDate = addDays(checkinDate, 6);
@@ -319,6 +422,11 @@ function generateDocuments() {
 
   if (checkout <= checkin) {
     showMessage("Check-out date must be after check-in date.");
+    return;
+  }
+
+  if (!routes[departure[0]] || !routes[departure[0]][arrival[0]]) {
+    showMessage(`No direct flights from ${departure[2]} (${departure[0]}) to ${arrival[2]} (${arrival[0]}). Please choose another arrival airport.`);
     return;
   }
 
@@ -788,17 +896,28 @@ function findDepartureAirport(value) {
 }
 
 function chooseFlightOption(from, to, date, direction) {
-  const uaeAirport = direction === "outbound" ? to : from;
-  const foreignAirport = direction === "outbound" ? from : to;
-  const country = foreignAirport[3];
-  const servesUae = option => option.uae.includes(uaeAirport[0]);
-  const servesCountry = option => option.countries === ALL || option.countries.includes(country);
-  let options = flightScheduleOptions.filter(option => servesUae(option) && servesCountry(option));
-  // Prefer the home carrier of the departure country when one exists, alongside UAE carriers.
-  if (!options.length) options = flightScheduleOptions.filter(servesUae);
-  if (!options.length) options = flightScheduleOptions;
+  const uaeCode = direction === "outbound" ? to[0] : from[0];
+  const foreignCode = direction === "outbound" ? from[0] : to[0];
+  const codes = (routes[foreignCode] && routes[foreignCode][uaeCode]) || [];
+  const options = codes.map(code => flightScheduleOptions.find(option => option.code === code)).filter(Boolean);
+  if (!options.length) return null;
   const seed = `${from[0]}${to[0]}${toInputDate(date)}${direction}${Date.now()}`.split("").reduce((sum, char) => sum + char.charCodeAt(0), 0);
   return options[seed % options.length];
+}
+
+function servedUaeAirports(departure) {
+  const served = departure && routes[departure[0]] ? Object.keys(routes[departure[0]]) : [];
+  return uaeAirports.filter(airport => served.includes(airport[0]));
+}
+
+function refreshArrivalOptions() {
+  const departure = findDepartureAirport(departureInput.value);
+  const list = departure ? servedUaeAirports(departure) : uaeAirports;
+  const current = arrivalSelect.value;
+  arrivalSelect.innerHTML = (list.length ? list : uaeAirports)
+    .map(airport => `<option value="${airport[0]}">${formatUaeAirport(airport)}</option>`)
+    .join("");
+  if (list.some(airport => airport[0] === current)) arrivalSelect.value = current;
 }
 
 function terminalFor(code, option) {
