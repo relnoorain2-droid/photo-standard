@@ -414,3 +414,7 @@ textarea:focus { border-color: var(--blue); outline: 3px solid rgba(35,94,231,.1
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; }
 }
+
+.carrier-head { display: flex; align-items: center; gap: 10px; }
+.carrier-head small { display: block; color: var(--muted); font-size: 12px; font-weight: 700; }
+.carrier-badge { display: inline-grid; place-items: center; min-width: 44px; height: 34px; padding: 0 6px; border: 1px solid #cfd6df; border-radius: 8px; background: #eef2f7; color: #1f2937; font-size: 14px; font-weight: 900; letter-spacing: .03em; }
